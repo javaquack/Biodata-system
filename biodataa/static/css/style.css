@@ -1,64 +1,94 @@
 :root {
-    --sidebar-bg: #212529;
-    --sidebar-hover: #343a40;
-    --content-bg: #f8f9fa;
-    --danger-soft: #f8d7da;
-    --danger-text: #842029;
+    --sidebar-bg: #1a1e21;
+    --sidebar-hover: #2c3136;
+    --content-bg: #f3f6f9;
+    --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    --premium-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
 }
 
 body {
     background-color: var(--content-bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #334155;
 }
 
+/* Sidebar Styling */
 .sidebar {
     background-color: var(--sidebar-bg);
     min-height: 100vh;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar-logo {
+    padding: 2rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: white;
-    padding-top: 20px;
+    letter-spacing: -0.5px;
 }
 
 .sidebar .nav-link {
-    color: #ced4da;
-    border-radius: 5px;
-    margin: 5px 15px;
-    padding: 12px;
+    color: #94a3b8;
+    border-radius: 8px;
+    margin: 4px 16px;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+    font-weight: 500;
 }
 
 .sidebar .nav-link:hover, .sidebar .nav-link.active {
-    background-color: var(--sidebar-hover);
+    background-color: rgba(255,255,255,0.1);
     color: white;
+    transform: translateX(4px);
 }
 
-.main-content {
-    padding: 30px;
+/* Card Styling */
+.card {
+    border: none;
+    box-shadow: var(--premium-shadow);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.low-attendance {
-    background-color: var(--danger-soft) !important;
-    color: var(--danger-text) !important;
+.card:hover {
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.12);
 }
 
 .academic-card {
-    border-left: 5px solid #0d6efd;
-    transition: 0.3s;
+    border-top: 4px solid #0d6efd;
 }
 
-.semester-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+/* Form Controls */
+.form-control, .form-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: border-color 0.15s ease;
 }
 
-.stat-bar {
-    height: 10px;
-    border-radius: 5px;
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
 }
 
-.upload-area {
-    border: 2px dashed #dee2e6;
+/* Utility */
+.main-content {
     padding: 40px;
-    text-align: center;
-    background: white;
-    border-radius: 10px;
-    cursor: pointer;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hover-up { 
+    transition: transform 0.2s ease;
+}
+
+.hover-up:hover {
+    transform: translateY(-3px);
 }

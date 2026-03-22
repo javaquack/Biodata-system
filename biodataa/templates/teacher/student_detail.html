@@ -1,60 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row">
+<div class="row animate-fade-in">
     <div class="col-md-4">
-        <div class="card shadow-sm text-center p-4">
+        <div class="card shadow-sm text-center p-4 border-0">
             <div class="mb-3">
-                <i class="fas fa-user-circle fa-5x text-secondary"></i>
+                <i class="fas fa-user-circle fa-5x text-secondary opacity-50"></i>
             </div>
-            <h4>{{ student.name }}</h4>
-            <p class="text-muted small">Adm: {{ student.reg_no }} | Univ: {{ student.univ_no or 'N/A' }}</p>
+            <h4 class="fw-bold">{{ student.name }}</h4>
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+                <span class="badge bg-primary px-3">Adm: {{ student.reg_no }}</span>
+                {% if student.univ_no %}
+                <span class="badge bg-secondary px-3">Univ: {{ student.univ_no }}</span>
+                {% endif %}
+            </div>
             <hr>
-            <div class="text-start">
-                <p><strong>Father:</strong> {{ student.father_name or 'N/A' }}</p>
-                <p><strong>Mother:</strong> {{ student.mother_name or 'N/A' }}</p>
-                <p><strong>Gender:</strong> {{ student.gender or 'N/A' }}</p>
-                <p><strong>Blood Group:</strong> {{ student.blood_group or 'N/A' }}</p>
-                <p><strong>DOB:</strong> {{ student.date_of_birth or 'N/A' }}</p>
+            <div class="text-start px-2">
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Parental Details</label>
+                    <p class="mb-1"><strong>Father:</strong> {{ student.father_name or 'N/A' }}</p>
+                    <p class="mb-0"><strong>Mother:</strong> {{ student.mother_name or 'N/A' }}</p>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="text-muted small d-block">Gender</label>
+                        <p class="mb-0">{{ student.gender or 'N/A' }}</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small d-block">Blood Group</label>
+                        <p class="mb-0 text-danger fw-bold">{{ student.blood_group or 'N/A' }}</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Date of Birth</label>
+                    <p class="mb-0">{{ student.date_of_birth or 'N/A' }}</p>
+                </div>
                 <hr>
-                <p><strong>Email:</strong> {{ student.email or 'N/A' }}</p>
-                <p><strong>Phone:</strong> {{ student.phone or 'N/A' }}</p>
-                <p><strong>Address:</strong> {{ student.address or 'N/A' }}</p>
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Contact Info</label>
+                    <p class="mb-1 fw-bold text-primary"><i class="fas fa-envelope me-2 small"></i>{{ student.email or 'N/A' }}</p>
+                    <p class="mb-0"><i class="fas fa-phone me-2 small"></i>{{ student.phone or 'N/A' }}</p>
+                </div>
+                <div>
+                    <label class="text-muted small d-block">Address</label>
+                    <p class="mb-0 small lh-sm">{{ student.address or 'N/A' }}</p>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Academic Performance History</h5>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white py-3">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Academic Performance History</h5>
             </div>
             <div class="card-body">
-                <ul class="nav nav-tabs" id="semTabs">
+                {% set ns = namespace(active_sem='S1') %}
+                {% for s in semesters %}
+                    {% if s in records %}
+                        {% set ns.active_sem = s %}
+                    {% endif %}
+                {% endfor %}
+
+                <ul class="nav nav-pills mb-4 bg-light p-2 rounded" id="semTabs">
                     {% for sem in semesters %}
                     <li class="nav-item">
-                        <a class="nav-link {% if sem == 'S3' %}active{% endif %}" data-bs-toggle="tab" href="#tab-{{ sem }}">{{ sem }}</a>
+                        <a class="nav-link {% if sem == ns.active_sem %}active shadow-sm{% endif %}" data-bs-toggle="tab" href="#tab-{{ sem }}">{{ sem }}</a>
                     </li>
                     {% endfor %}
                 </ul>
-                <div class="tab-content mt-4">
+                <div class="tab-content mt-2">
                     {% for sem in semesters %}
-                    <div class="tab-pane fade {% if sem == 'S3' %}show active{% endif %}" id="tab-{{ sem }}">
+                    <div class="tab-pane fade {% if sem == ns.active_sem %}show active{% endif %}" id="tab-{{ sem }}">
                         {% if sem in records %}
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <h6 class="text-muted small mb-1">Semester GPA</h6>
-                                    <h5 class="fw-bold text-primary">{{ records[sem].sgpa or '-' }}</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-primary-subtle border-start border-primary border-4 rounded">
+                                        <h6 class="text-muted small mb-1 uppercase fw-bold">Semester GPA</h6>
+                                        <h4 class="fw-bold text-primary mb-0">{{ records[sem].sgpa or '-' }}</h4>
+                                    </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <h6 class="text-muted small mb-1">Cumulative GPA</h6>
-                                    <h5 class="fw-bold text-success">{{ records[sem].cgpa or '-' }}</h5>
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-success-subtle border-start border-success border-4 rounded">
+                                        <h6 class="text-muted small mb-1 uppercase fw-bold">Cumulative GPA</h6>
+                                        <h4 class="fw-bold text-success mb-0">{{ records[sem].cgpa or '-' }}</h4>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-info-subtle border-start border-info border-4 rounded">
+                                        <h6 class="text-muted small mb-1 uppercase fw-bold">Attendance</h6>
+                                        <h4 class="fw-bold text-info mb-0">{{ records[sem].attendance_percentage or '0' }}%</h4>
+                                    </div>
                                 </div>
                             </div>
-                                <div class="col-md-12 mt-3">
-                                    <h6>Internal / Result Marks:</h6>
-                                    <table class="table table-bordered table-sm text-center">
-                                        <thead class="bg-light">
+                            
+                            <div class="col-md-12">
+                                <h6 class="fw-bold mb-3 d-flex align-items-center">
+                                    <i class="fas fa-list-ul me-2 text-muted"></i> Internal / Result Marks
+                                </h6>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered text-center align-middle">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th class="text-start">Subject Code</th>
+                                                <th class="text-start">Subject Details</th>
                                                 <th>Series 1</th>
                                                 <th>Series 2</th>
                                                 <th>Internals</th>
@@ -67,24 +113,27 @@
                                                 {% for sub, details in records[sem].internal_marks_json.items() %}
                                                 <tr>
                                                     <td class="text-start">
-                                                        <span class="fw-bold">{{ sub }}</span><br>
-                                                        <small class="text-muted">{{ details.get('_label', '') }}</small>
+                                                        <span class="fw-bold d-block">{{ sub }}</span>
+                                                        <small class="text-muted text-wrap d-block" style="max-width: 250px;">{{ details.get('_label', '') }}</small>
                                                     </td>
                                                     {% if details is mapping %}
-                                                        <td>{{ details.get('series_1', '-') }}</td>
-                                                        <td>{{ details.get('series_2', '-') }}</td>
-                                                        <td>{{ details.get('internals', '-') }}</td>
+                                                        <td><span class="fw-medium">{{ details.get('series_1', '-') }}</span></td>
+                                                        <td><span class="fw-medium">{{ details.get('series_2', '-') }}</span></td>
+                                                        <td><span class="fw-bold">{{ details.get('internals', '-') }}</span></td>
                                                         <td>
                                                             {% set grade = details.get('end_sem', '-') %}
                                                             {% if grade != '-' %}
-                                                                <span class="badge rounded-pill {% if grade in ['F', 'I', 'Absent', 'ABSENT'] %}bg-danger{% elif grade in ['S', 'A+', 'A'] %}bg-success{% else %}bg-primary{% endif %}" style="min-width: 30px;">
+                                                                <span class="badge rounded-pill {% if grade in ['F', 'I', 'Absent', 'ABSENT'] %}bg-danger{% elif grade in ['O', 'S', 'A+', 'A'] %}bg-success{% else %}bg-primary{% endif %}" style="min-width: 35px; padding: 0.5em;">
                                                                     {{ grade }}
                                                                 </span>
                                                             {% else %}
                                                                 <span class="text-muted">-</span>
                                                             {% endif %}
                                                         </td>
-                                                        <td>{{ details.get('attendance', '-') }}</td>
+                                                        <td>
+                                                            {% set att = details.get('attendance', '-') %}
+                                                            <span class="{% if att|float < 75 and att != '-' %}text-danger fw-bold{% endif %}">{{ att }}{% if att != '-' %}%{% endif %}</span>
+                                                        </td>
                                                     {% else %}
                                                         <td>-</td><td>-</td><td>-</td>
                                                         <td><span class="badge bg-secondary">{{ details }}</span></td>
@@ -93,16 +142,16 @@
                                                 </tr>
                                                 {% endfor %}
                                             {% else %}
-                                                <tr><td colspan="6" class="text-muted">No detailed marks available.</td></tr>
+                                                <tr><td colspan="6" class="text-muted py-4 small">Detailed marks not available.</td></tr>
                                             {% endif %}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         {% else %}
-                            <div class="text-center py-5 text-muted">
-                                <i class="fas fa-folder-open fa-2x mb-2"></i>
-                                <p>No data recorded for {{ sem }} yet.</p>
+                            <div class="text-center py-5">
+                                <i class="fas fa-folder-open fa-3x text-light-emphasis mb-3"></i>
+                                <h6 class="text-muted">No academic results recorded for {{ sem }} yet.</h6>
                             </div>
                         {% endif %}
                     </div>

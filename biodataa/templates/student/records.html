@@ -3,16 +3,22 @@
 <h2 class="mb-4">My Academic History</h2>
 <div class="card shadow-sm">
     <div class="card-body">
+        {% set ns = namespace(active_sem='S1') %}
+        {% for s in semesters %}
+            {% if s in records %}
+                {% set ns.active_sem = s %}
+            {% endif %}
+        {% endfor %}
         <ul class="nav nav-pills mb-4" id="pills-tab">
             {% for sem in semesters %}
             <li class="nav-item">
-                <button class="nav-link {% if sem == 'S3' %}active{% endif %}" data-bs-toggle="pill" data-bs-target="#p-{{ sem }}">{{ sem }}</button>
+                <button class="nav-link {% if sem == ns.active_sem %}active{% endif %}" data-bs-toggle="pill" data-bs-target="#p-{{ sem }}">{{ sem }}</button>
             </li>
             {% endfor %}
         </ul>
         <div class="tab-content">
             {% for sem in semesters %}
-            <div class="tab-pane fade {% if sem == 'S3' %}show active{% endif %}" id="p-{{ sem }}">
+            <div class="tab-pane fade {% if sem == ns.active_sem %}show active{% endif %}" id="p-{{ sem }}">
                 {% if sem in records %}
                     <div class="mb-4 d-flex gap-3">
                         <div class="bg-light p-3 rounded shadow-sm border-start border-primary border-4">

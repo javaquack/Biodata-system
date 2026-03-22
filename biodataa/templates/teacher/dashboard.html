@@ -2,12 +2,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Teacher Dashboard</h2>
-    <div class="d-flex align-items-center">
-        <label class="me-2 fw-bold">Select Semester:</label>
+    <div class="d-flex align-items-center bg-white p-2 px-3 rounded shadow-sm border">
+        <label class="me-3 fw-bold text-muted small">SELECT SEMESTER</label>
         <form id="semForm" action="{{ url_for('dashboard') }}" method="GET">
-            <select name="semester" class="form-select w-auto" onchange="this.form.submit()">
+            <select name="semester" class="form-select border-0 bg-light fw-bold text-primary" style="min-width: 180px; cursor: pointer;" onchange="this.form.submit()">
                 {% for i in range(1, 9) %}
-                <option value="S{{i}}" {% if current_sem == 'S'+i|string %}selected{% endif %}>Semester {{i}}</option>
+                {% set sem_val = 'S' ~ i %}
+                <option value="{{ sem_val }}" {% if current_sem == sem_val %}selected{% endif %}>Semester {{ i }}</option>
                 {% endfor %}
             </select>
         </form>
@@ -17,36 +18,27 @@
 <div class="row">
     {% for item in data %}
     <div class="col-md-4 mb-4">
-        <div class="card shadow-sm h-100 academic-card {% if item.record and item.record.attendance_percentage < 75 %}border-danger{% endif %}">
+        <div class="card shadow-sm h-100 academic-card">
             <div class="card-body">
-                <h5 class="card-title">{{ item.profile.name }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ item.profile.reg_no }}</h6>
+                <h5 class="card-title mb-1">{{ item.profile.name }}</h5>
+                <h6 class="card-subtitle mb-3 text-muted small">{{ item.profile.reg_no }}</h6>
                 
                 <hr>
                 
-                <div class="mb-2">
-                    <label class="small text-muted d-block">Attendance</label>
-                    <div class="progress mt-1" style="height: 10px;">
-                        {% set att = item.record.attendance_percentage if item.record else 0 %}
-                        <div class="progress-bar {% if att < 75 %}bg-danger{% else %}bg-success{% endif %}" 
-                             role="progressbar" style="width:{{ att }}%"></div>
+                <div class="row mt-3">
+                    <div class="col-6 border-end">
+                        <label class="small text-muted d-block">University No</label>
+                        <span class="fw-bold">{{ item.profile.univ_no or 'N/A' }}</span>
                     </div>
-                    <span class="small {% if att < 75 %}text-danger fw-bold{% endif %}">{{ att }}%</span>
-                </div>
-
-                <div class="mt-3">
-                    <label class="small text-muted d-block mb-1">Subject Performance (Internal)</label>
-                    {% if item.record and item.record.internal_marks_json %}
-                        {% for code, mark in item.record.internal_marks_json.items() %}
-                        <span class="badge bg-light text-dark border me-1 mb-1">{{ code }}: {{ mark }}</span>
-                        {% endfor %}
-                    {% else %}
-                        <span class="text-muted italic small">No data uploaded</span>
-                    {% endif %}
+                    <div class="col-6 ps-3">
+                        <label class="small text-muted d-block" title="Shows the most recently assigned CGPA across all semesters">Current CGPA</label>
+                        <span class="h5 mb-0 fw-bold text-success">{{ item.latest_cgpa or 'N/A' }}</span>
+                    </div>
                 </div>
             </div>
-            <div class="card-footer bg-white border-0">
-                <a href="{{ url_for('student_detail', id=item.profile.id) }}" class="btn btn-sm btn-outline-primary w-100">View Detailed Biodata</a>
+            <div class="card-footer bg-white border-0 pb-3">
+                <a href="{{ url_for('student_detail', id=item.profile.id) }}"
+                    class="btn btn-sm btn-outline-primary w-100">View Detailed Biodata</a>
             </div>
         </div>
     </div>

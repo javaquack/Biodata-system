@@ -10,13 +10,14 @@
                 <p class="text-muted">You can upload the files here. The system will automatically map data
                     using <b>Register Number</b> and <b>Subject Codes</b>.</p>
 
-                <form action="{{ url_for('upload_files') }}" method="POST" enctype="multipart/form-data">
+                <form id="uploadForm" action="{{ url_for('upload_files') }}" method="POST" enctype="multipart/form-data" onsubmit="return handleUpload(event)">
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Target Semester</label>
                             <select name="semester" class="form-select" required>
+                                <option value="" disabled selected>Select Semester</option>
                                 {% for i in range(1, 9) %}
-                                <option value="S{{i}}" {% if i==3 %}selected{% endif %}>Semester {{i}}</option>
+                                <option value="S{{i}}">Semester {{i}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -53,11 +54,33 @@
 <script>
     function updateFileList(input) {
         const list = document.getElementById('fileList');
-        list.innerHTML = '<strong>Selected Files:</strong><ul class="mb-0">';
-        for (let i = 0; i < input.files.length; i++) {
-            list.innerHTML += `<li>${input.files[i].name}</li>`;
+        if (input.files.length === 0) {
+            list.innerHTML = '';
+            return;
         }
-        list.innerHTML += '</ul>';
+        let listHTML = '<div class="alert alert-light border mt-3 mb-0"><small class="fw-bold d-block mb-1">Selected Files:</small><ul class="mb-0 small ps-3">';
+        for (let i = 0; i < input.files.length; i++) {
+            listHTML += `<li>${input.files[i].name}</li>`;
+        }
+        listHTML += '</ul></div>';
+        list.innerHTML = listHTML;
+    }
+
+    function handleUpload(e) {
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput.files.length === 0) {
+            alert("Please select at least one file to process.");
+            return false;
+        }
+
+        const confirmData = confirm("Are you sure you want to process and integrate these files into the student database?");
+        if (confirmData) {
+            const btn = document.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Integrating Data... Please wait';
+            return true;
+        }
+        return false;
     }
 </script>
 {% endblock %}

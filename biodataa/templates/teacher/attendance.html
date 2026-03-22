@@ -2,13 +2,17 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Attendance Shortage Tracker</h2>
-    <form action="{{ url_for('attendance_view') }}" method="GET">
-        <select name="semester" class="form-select w-auto" onchange="this.form.submit()">
-            {% for i in range(1, 9) %}
-            <option value="S{{i}}" {% if current_sem == 'S'+i|string %}selected{% endif %}>Semester {{i}}</option>
-            {% endfor %}
-        </select>
-    </form>
+    <div class="d-flex align-items-center bg-white p-2 px-3 rounded shadow-sm border">
+        <label class="me-3 fw-bold text-muted small">SELECT SEMESTER</label>
+        <form action="{{ url_for('attendance_view') }}" method="GET">
+            <select name="semester" class="form-select border-0 bg-light fw-bold text-primary" style="min-width: 180px; cursor: pointer;" onchange="this.form.submit()">
+                {% for i in range(1, 9) %}
+                {% set sem_val = 'S' ~ i %}
+                <option value="{{ sem_val }}" {% if current_sem == sem_val %}selected{% endif %}>Semester {{ i }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
 </div>
 
 <div class="card shadow-sm">

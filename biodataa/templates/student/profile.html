@@ -1,67 +1,236 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row">
-    <div class="col-md-5 mx-auto">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white p-4 text-center">
-                <div class="mb-3">
-                    <i class="fas fa-user-graduate fa-4x"></i>
+<div class="container py-4">
+    <!-- Student Header Card -->
+    <div class="card border-0 shadow-sm mb-4 student-hero-card">
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <div class="col-md-3 bg-primary text-white d-flex flex-column align-items-center justify-content-center p-4 rounded-start student-avatar-section">
+                    <div class="avatar-circle mb-3">
+                        <i class="fas fa-user-graduate fa-5x"></i>
+                    </div>
+                    <h4 class="mb-0 text-center text-uppercase fw-bold">{{ student.name }}</h4>
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
+                        <span class="badge bg-white shadow-sm text-primary" title="Admission ID">{{ student.reg_no }}</span>
+                        {% if student.univ_no %}
+                        <span class="badge border border-white text-white" style="background: rgba(255,255,255,0.15);" title="University No">{{ student.univ_no }}</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <h3>Welcome, {{ student.name }}</h3>
-                <p class="mb-0">{{ student.reg_no }}</p>
-            </div>
-            <div class="card-body p-4">
-                <form action="{{ url_for('update_profile') }}" method="POST">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Father's Name</label>
-                            <input type="text" name="father_name" class="form-control" value="{{ student.father_name or '' }}">
+                <div class="col-md-9 p-4">
+                    <div class="row h-100 align-items-center">
+                        <div class="col-md-5 border-end text-center">
+                            <label class="text-muted small d-block mb-1">DEPARTMENT</label>
+                            <h5 class="fw-bold mb-0 text-dark">{{ dept_name }}</h5>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Mother's Name</label>
-                            <input type="text" name="mother_name" class="form-control" value="{{ student.mother_name or '' }}">
+                        <div class="col-md-4 border-end text-center">
+                            <label class="text-muted small d-block mb-1">CURRENT CGPA</label>
+                            <h2 class="fw-bold mb-0 text-success">{{ latest_cgpa or 'N/A' }}</h2>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Gender</label>
-                            <select name="gender" class="form-select">
-                                <option value="">Select</option>
-                                <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
-                                <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
-                                <option value="Other" {% if student.gender == 'Other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Blood Group</label>
-                            <input type="text" name="blood_group" class="form-control" value="{{ student.blood_group or '' }}" placeholder="e.g. O+">
+                        <div class="col-md-3 text-center">
+                            <a href="{{ url_for('student_records') }}" class="btn btn-outline-primary shadow-sm hover-up">
+                                <i class="fas fa-chart-line me-2"></i>View Records
+                            </a>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Date of Birth</label>
-                        <input type="date" name="date_of_birth" class="form-control" value="{{ student.date_of_birth or '' }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Email Address</label>
-                        <input type="email" name="email" class="form-control" value="{{ student.email or '' }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Mobile Number</label>
-                        <input type="text" name="phone" class="form-control" value="{{ student.phone or '' }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Residential Address</label>
-                        <textarea name="address" class="form-control" rows="3">{{ student.address or '' }}</textarea>
-                    </div>
-                    <div class="d-grid shadow-sm">
-                        <button type="submit" class="btn btn-primary">Update Personal Details</button>
-                    </div>
-                </form>
-                <div class="mt-4 p-3 bg-light rounded">
-                    <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Note: Academic marks and attendance can only be updated by the teacher/administrator.</small>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Details Section -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-address-card me-2 text-primary"></i>Personal Information</h5>
+                    <button class="btn btn-sm btn-outline-primary px-3" id="editBtn" onclick="toggleEditMode()">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary px-3 d-none" id="cancelBtn" onclick="toggleEditMode()">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                </div>
+                <div class="card-body p-4">
+                    <form id="profileForm" action="{{ url_for('update_profile') }}" method="POST" onsubmit="return confirmSubmission(event)">
+                        <!-- View Mode Container -->
+                        <div id="viewMode">
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small d-block">Father's Name</label>
+                                    <p class="h6 fw-normal mb-0">{{ student.father_name or 'Not Set' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small d-block">Mother's Name</label>
+                                    <p class="h6 fw-normal mb-0">{{ student.mother_name or 'Not Set' }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small d-block">Gender</label>
+                                    <p class="h6 fw-normal mb-0">{{ student.gender or 'Not Set' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small d-block">Blood Group</label>
+                                    <p class="h6 fw-normal mb-0 text-danger fw-bold">{{ student.blood_group or 'Not Set' }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small d-block">Date of Birth</label>
+                                    <p class="h6 fw-normal mb-0">{{ student.date_of_birth or 'Not Set' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small d-block">Mobile Number</label>
+                                    <p class="h6 fw-normal mb-0">{{ student.phone or 'Not Set' }}</p>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="text-muted small d-block">Email Address</label>
+                                <p class="h6 fw-normal mb-0">{{ student.email or 'Not Set' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted small d-block">Residential Address</label>
+                                <p class="h6 fw-normal mb-0 lh-base">{{ student.address or 'Not Set' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Edit Mode Container (Hidden initially) -->
+                        <div id="editMode" class="d-none animate-in">
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold">Father's Name</label>
+                                    <input type="text" name="father_name" class="form-control" value="{{ student.father_name or '' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold">Mother's Name</label>
+                                    <input type="text" name="mother_name" class="form-control" value="{{ student.mother_name or '' }}">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold">Gender</label>
+                                    <select name="gender" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
+                                        <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
+                                        <option value="Other" {% if student.gender == 'Other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold">Blood Group</label>
+                                    <input type="text" name="blood_group" class="form-control" value="{{ student.blood_group or '' }}" placeholder="e.g. O+">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Date of Birth</label>
+                                <input type="date" name="date_of_birth" class="form-control" value="{{ student.date_of_birth or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Email Address</label>
+                                <input type="email" name="email" class="form-control" value="{{ student.email or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Mobile Number</label>
+                                <input type="text" name="phone" class="form-control" value="{{ student.phone or '' }}">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">Residential Address</label>
+                                <textarea name="address" class="form-control" rows="3">{{ student.address or '' }}</textarea>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg shadow">
+                                    <i class="fas fa-save me-2"></i>Save Final Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4 bg-light rounded-3 overflow-hidden">
+                <div class="card-body p-4 text-center">
+                    <img src="https://ui-avatars.com/api/?name={{ student.name | replace(' ', '+') }}&background=0D6EFD&color=fff&size=128" 
+                         class="rounded-circle shadow-sm border border-3 border-white mb-3" alt="Avatar">
+                    <h5 class="fw-bold mb-0 text-dark">{{ student.name }}</h5>
+                    <p class="text-muted small mb-0">{{ student.reg_no }}</p>
+                    <hr class="my-3 mx-auto w-50">
+                    <div class="d-flex justify-content-center gap-2">
+                        <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3">Active Student</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info border-0 shadow-sm" role="alert">
+                <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Important Note</h6>
+                <small class="d-block mb-0">Academic records (SGPA/CGPA) and attendance metrics are managed exclusively by the administration. Personal details can be updated for biodata accuracy.</small>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .student-hero-card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .student-avatar-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+    }
+    .hover-up {
+        transition: transform 0.2s;
+    }
+    .hover-up:hover {
+        transform: translateY(-2px);
+    }
+    .animate-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    function toggleEditMode() {
+        const view = document.getElementById('viewMode');
+        const edit = document.getElementById('editMode');
+        const editBtn = document.getElementById('editBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        
+        if (view.classList.contains('d-none')) {
+            view.classList.remove('d-none');
+            edit.classList.add('d-none');
+            editBtn.classList.remove('d-none');
+            cancelBtn.classList.add('d-none');
+        } else {
+            view.classList.add('d-none');
+            edit.classList.remove('d-none');
+            editBtn.classList.add('d-none');
+            cancelBtn.classList.remove('d-none');
+        }
+    }
+
+    function confirmSubmission(e) {
+        const result = confirm("Are you sure you want to update your professional profile details?");
+        if (!result) {
+            e.preventDefault();
+            return false;
+        }
+        return true;
+    }
+</script>
 {% endblock %}

@@ -1,57 +1,110 @@
 # Web-Based Academic Biodata Management System
 
-A production-ready Flask application for managing student academic history across 8 semesters. It features a unified data integration system that parses disparate PDFs and Excel files to merge attendance and marks into a single student biodata profile based on **Register Number** and **Subject Codes**.
+A Flask web application for managing student academic records across 8 semesters. It features a data integration system that parses PDFs and Excel files to merge attendance and marks into a single student biodata profile using **Register Number** and **Subject Codes**.
 
 ## 🚀 Key Features
--   **Integrated Data Parser**: Upload multiple PDFs/Excels at once. The system automatically identifies "Reg No" columns and "Subject Code" headers (e.g., MAT203) to update student records.
--   **Teacher Dashboard**:
-    -   Semester-wise filtering (S1 to S8).
-    -   Visual alerts (RED background) for students with attendance below 75%.
-    -   Unified Biodata view with history of all 8 semesters.
--   **Student Module**:
-    -   View personal integrated academic records.
-    -   Self-service profile updates (Contacts, Address).
--   **Multi-Semester Architecture**: Dedicated storage and views for data from S1 through S8.
+
+- **Integrated Data Parser**: Upload multiple PDFs/Excel files at once. The system automatically identifies student IDs and subject codes to update records.
+- **Teacher Dashboard**:
+  - Semester-wise filtering (S1 to S8).
+  - Visual alerts for students with attendance below 75%.
+  - Unified Biodata view with history of all 8 semesters.
+  - Delete student records.
+- **Student Module**:
+  - View personal academic records across all semesters.
+  - Self-service profile updates (phone, email, address, etc.).
+- **Multi-Semester Architecture**: Supports data from S1 through S8.
 
 ## 🛠 Prerequisites
--   Python 3.8 or higher
--   Pip (Python package manager)
 
-## 📥 Installation
+- Python 3.8 or higher
+- Pip (Python package manager)
 
-1.  **Extract the project files** to your desired directory.
+## 📥 Setup (Step-by-Step)
 
-2.  **Install dependencies**:
-    bash
-    pip install -r requirements.txt
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/Biodata-system.git
+cd Biodata-system/biodataa
+```
 
-## 🏃 How to Run
+### 2. Create a virtual environment
+```bash
+python -m venv venv
+```
 
-1.  **Initialize and start the server**:
-    bash
-    python app.py
+### 3. Activate the virtual environment
 
-2.  **Access the application**:
-    Open your browser and go to `http://127.0.0.1:5000`
+**Windows:**
+```bash
+venv\Scripts\activate
+```
 
-## 🔑 Default Credentials
--   **Teacher (Admin)**:
-    -   Username: `admin`
-    -   Password: `admin123`
--   **Student (Example)**:
-    -   Username: `KTE21CS001`
-    -   Password: `student123`
+**Mac / Linux:**
+```bash
+source venv/bin/activate
+```
 
-## 📁 File Structure
--   `app.py`: Core Flask application and database models.
--   `utils/parsers.py`: Logic for extracting data from PDF/Excel and linking via Subject Codes.
--   `templates/`: HTML structure split by Teacher and Student roles.
--   `static/`: CSS for the sidebar and attendance "red-bar" styling.
--   `uploads/`: Temporary storage for uploaded PDF/Excel files.
+### 4. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-## 📝 Usage for Teachers
-1.  Navigate to **Upload Data**.
-2.  Select the Target Semester (e.g., S3).
-3.  Choose multiple files (e.g., `attendance.xlsx`, `results_pdf.pdf`, `internals.csv`).
-4.  Click **Process**.
-5.  View the results in **Dashboard** (check for red highlights) or **Attendance** list.
+### 5. Run the application
+```bash
+python app.py
+```
+
+### 6. Open in browser
+Go to: [http://localhost:5000](http://localhost:5000)
+
+The database and admin account are created automatically on first run.
+
+## 🔑 Default Login
+
+| Role | Username | Password |
+|------|----------|----------|
+| Teacher (Admin) | `admin` | `admin123` |
+| Student | Their Register Number (e.g., `TL23BTCS0218`) | Same as register number in lowercase |
+
+> **Note:** Student accounts are created automatically when the teacher uploads data.
+
+## 📝 How to Use (For Teachers)
+
+1. Login with **admin / admin123**
+2. Go to **Upload Data**
+3. Select the **Semester** (S1 - S8)
+4. Select the **Data Type**:
+   - `End Semester` — for KTU results (grades, SGPA, CGPA)
+   - `Series 1` — for Series 1 internal marks
+   - `Series 2` — for Series 2 internal marks
+   - `Internals` — for internal assessment with attendance
+5. Upload your Excel/PDF files and click **Process**
+6. View results in **Dashboard** or **Attendance** page
+
+## 📁 Project Structure
+
+```
+biodataa/
+├── app.py              — Main Flask app (routes, models, config)
+├── requirements.txt    — Python dependencies
+├── README.md           — This file
+├── .gitignore          — Git ignore rules
+├── utils/
+│   └── parsers.py      — Data parser (reads Excel/PDF, saves to DB)
+├── templates/
+│   ├── base.html       — Base layout template
+│   ├── login.html      — Login page
+│   ├── teacher/        — Teacher pages (dashboard, upload, etc.)
+│   └── student/        — Student pages (profile, records)
+├── static/
+│   └── css/            — Stylesheets
+└── uploads/            — Temporary storage for uploaded files
+```
+
+## 🔧 Tech Stack
+
+- **Backend**: Python, Flask
+- **Database**: SQLite (via Flask-SQLAlchemy)
+- **Authentication**: Flask-Login
+- **Data Parsing**: Pandas, OpenPyXL, PDFPlumber

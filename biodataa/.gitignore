@@ -5,12 +5,11 @@ __pycache__/
 venv/
 .venv/
 
-# Database
+# Database (auto-created when app starts)
 *.db
-biodata_v2.db
 
-# Uploaded Files
-uploads/
+# Uploaded Files (user-specific, not needed in repo)
+uploads/*
 !uploads/.gitkeep
 
 # Temporary/Debug Files
@@ -21,3 +20,7 @@ debug*.json
 .vscode/
 .idea/
 .DS_Store
+
+# OS files
+Thumbs.db
+Desktop.ini
