@@ -13,6 +13,23 @@ body {
 }
 
 /* Sidebar Styling */
+@media (min-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        padding: 0;
+        width: 16.666667%; /* col-md-2 equivalent */
+        overflow-y: auto;
+    }
+
+    .main-content {
+        margin-left: 16.666667%; /* Ensure main content doesn't hide behind fixed sidebar */
+    }
+}
+
 .sidebar {
     background-color: var(--sidebar-bg);
     min-height: 100vh;
