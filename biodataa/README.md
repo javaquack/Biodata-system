@@ -82,25 +82,6 @@ The database and admin account are created automatically on first run.
 5. Upload your Excel/PDF files and click **Process**
 6. View results in **Dashboard** or **Attendance** page
 
-## 📁 Project Structure
-
-```
-biodataa/
-├── app.py              — Main Flask app (routes, models, config)
-├── requirements.txt    — Python dependencies
-├── README.md           — This file
-├── .gitignore          — Git ignore rules
-├── utils/
-│   └── parsers.py      — Data parser (reads Excel/PDF, saves to DB)
-├── templates/
-│   ├── base.html       — Base layout template
-│   ├── login.html      — Login page
-│   ├── teacher/        — Teacher pages (dashboard, upload, etc.)
-│   └── student/        — Student pages (profile, records)
-├── static/
-│   └── css/            — Stylesheets
-└── uploads/            — Temporary storage for uploaded files
-```
 
 ## 🔧 Tech Stack
 
