@@ -106,7 +106,8 @@ def process_academic_files(file_paths, semester, data_type, db,
             # If the filename contains "S3", "S5", etc., use that instead of the dropdown value
             file_sem = semester  # Default: use what the teacher selected
             basename = os.path.basename(path).upper()
-            sem_match = re.search(r'\b(S[1-8])\b', basename)
+            # More generic detection for 'S1' through 'S8' anywhere in the name
+            sem_match = re.search(r'(S[1-8])', basename)
             if sem_match:
                 file_sem = sem_match.group(1)
 
@@ -482,10 +483,10 @@ def process_dataframe(df, data_map, data_type, last_context=None):
             # Look for ID values in each cell to identify ID columns
             for j, val in enumerate(row):
                 v_upper = val.upper()
-                if (tl_pattern.search(v_upper) or 'TL23' in v_upper) and admin_col == -1:
+                if tl_pattern.search(v_upper) and admin_col == -1:
                     admin_col = j
                     print(f"DEBUG: Found likely Admin No column at index {j} (sample: {val})")
-                if (vas_pattern.search(v_upper) or 'VAS23' in v_upper or 'LVAS' in v_upper) and univ_col == -1:
+                if vas_pattern.search(v_upper) and univ_col == -1:
                     univ_col = j
                     print(f"DEBUG: Found likely Univ No column at index {j} (sample: {val})")
 
@@ -615,10 +616,6 @@ def process_dataframe(df, data_map, data_type, last_context=None):
         if not key_id:
             continue
 
-        # Skip students from other batches (2021, 2022)
-        if any(x in str(key_id).upper() for x in ['VAS22', 'LVAS22', 'TL22', 'VAS21', 'LVAS21', 'TL21']):
-            continue
-
         # Skip rows that look like headers (sometimes headers repeat in the data)
         row_full_text = " ".join([str(v) for v in row.values]).upper()
         if any(kw in row_full_text for kw in ['STUDENT ID', 'NAME OF STUDENT', 'REGISTER NO', 'ROLL NO']):
@@ -666,11 +663,11 @@ def process_dataframe(df, data_map, data_type, last_context=None):
 
                 # For Series 1: skip columns that are clearly for Series 2
                 if data_type == 'series_1':
-                    if '2' in h_clean and '1' not in h_clean and 'II' not in h_clean:
+                    if re.search(r'SERIES\s*2', h_clean) or 'SERIES II' in h_clean or 'SERIES-2' in h_clean or 'INTERNAL 2' in h_clean:
                         continue
                 # For Series 2: skip columns that are clearly for Series 1
                 elif data_type == 'series_2':
-                    if '1' in h_clean and '2' not in h_clean and ' I' not in h_clean:
+                    if (re.search(r'SERIES\s*1', h_clean) or 'SERIES-1' in h_clean or 'INTERNAL 1' in h_clean) and not re.search(r'SERIES\s*2', h_clean) and 'SERIES II' not in h_clean:
                         continue
 
             # --- Capture attendance for INTERNALS reports ---
@@ -689,7 +686,7 @@ def process_dataframe(df, data_map, data_type, last_context=None):
 
                 # Skip zero-mark and batch-specific subjects for series
                 if data_type in ['series_1', 'series_2']:
-                    if '(0)' in s_upper or 'BATCH1' in s_upper or 'EET283' in s_upper:
+                    if '(0)' in s_upper or 'BATCH1' in s_upper:
                         continue
 
                 # Extract the subject code from the full subject name
@@ -698,7 +695,8 @@ def process_dataframe(df, data_map, data_type, last_context=None):
                     r'((?:TL|VAS|LVAS|AJC)\d{2}[A-Z]{2,4}\d{2,4})', '',
                     subj_full.upper(), flags=re.IGNORECASE
                 )
-                code_match = re.search(r'\b([A-Z]{2,3}\d{3})\b', s_clean.replace(' ', ''))
+                # Don't strip spaces before search! Word boundaries \b need them.
+                code_match = re.search(r'\b([A-Z]{2,4}\s?\d{3,4})\b', s_clean)
 
                 if code_match:
                     code = code_match.group(1)
